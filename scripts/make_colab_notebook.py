@@ -68,7 +68,7 @@ for m, src in FILES.items():
     cells.append(code(f"%%writefile /content/pkg/lobgen/{m}.py\n" + src))
 cells += [
     code("""
-# Speed check: 15 s of one file. If this is under ~5 MB/s, total time is large; tell Claude.
+# Speed check: 15 s of one file. If this is under ~5 MB/s, expect the full fetch to take hours.
 import subprocess
 r = subprocess.run(["curl", "-s", "-m", "15", "-o", "/dev/null", "-w", "%{speed_download}",
                     "-r", "0-2000000000", BASE + DAYS["2025-12-12"]], capture_output=True, text=True)

@@ -18,6 +18,9 @@ This is still a work in progress. The data pipeline, the evaluation and the v2 m
 finished and reproducible. My two follow-up models (v3 and v4) made things worse, and working
 out why is what I'm doing now (see [What I'm working on](#what-im-working-on)).
 
+I used Claude Code to write most of the code. [How I used AI](#how-i-used-ai) explains what was
+mine and how the results are checked.
+
 ## What I found
 
 The test is simple. I pick a moment in the real trading day, let a generator continue the order
@@ -418,6 +421,23 @@ sooner in rollouts, and v4 barely uses the market. Analysis and next steps:
   generator really is.
 - 44 sub-dollar stub quotes (e.g. a $0.0001 bid) are off the tick grid and are the only rows
   the simulator cannot reproduce exactly.
+
+## How I used AI
+
+I built this with Claude Code, Anthropic's coding agent. It wrote most of the code, ran the
+experiments and helped me work through the results. I chose the question, decided what to
+build and in what order, and judged which results to believe.
+
+An agent can produce convincing-looking numbers very quickly, so the project checks itself
+instead of relying on the code being right:
+
+- Encoding every real day into simulator actions and decoding it back reproduces all 45.3M
+  messages and book rows exactly (§2).
+- Real data replayed through the simulator must score AUC 0.50, and two real stretches of the
+  same day must score about 0.5. Both do, which rules out leaks in the detective (§4).
+- A test checks that the inputs the model sees while generating are exactly the ones it was
+  trained on.
+- 53 tests in total (`uv run --group model --group bench pytest`).
 
 ## Full detective tables
 
