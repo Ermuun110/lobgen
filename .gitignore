@@ -1,0 +1,8 @@
+data/
+third_party/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+checkpoints/
+.DS_Store

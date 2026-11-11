@@ -1,0 +1,48 @@
+{
+ "GOOG": {
+  "real": {
+   "deletes": 9857,
+   "rank_le4": 0.439,
+   "rank_le9": 0.682,
+   "size100": 0.791,
+   "log10_size": 1.83
+  },
+  "history": {
+   "deletes": 9948,
+   "rank_le4": 0.129,
+   "rank_le9": 0.207,
+   "size100": 0.347,
+   "log10_size": 1.369
+  },
+  "v1": {
+   "deletes": 9369,
+   "rank_le4": 0.213,
+   "rank_le9": 0.326,
+   "size100": 0.265,
+   "log10_size": 1.379
+  }
+ },
+ "INTC": {
+  "real": {
+   "deletes": 9064,
+   "rank_le4": 0.354,
+   "rank_le9": 0.545,
+   "size100": 0.434,
+   "log10_size": 2.116
+  },
+  "history": {
+   "deletes": 9198,
+   "rank_le4": 0.299,
+   "rank_le9": 0.412,
+   "size100": 0.285,
+   "log10_size": 2.003
+  },
+  "v1": {
+   "deletes": 8840,
+   "rank_le4": 0.38,
+   "rank_le9": 0.52,
+   "size100": 0.215,
+   "log10_size": 2.054
+  }
+ }
+}

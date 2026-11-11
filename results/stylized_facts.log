@@ -1,0 +1,37 @@
+GOOG real_2025-12-08 done
+GOOG history done
+GOOG markov done
+GOOG v2 done
+
+**GOOG**: discrepancy from the real continuations (0 = identical)
+
+| fact | real_2025-12-08 | history | markov | v2 |
+|---|---|---|---|---|
+| spread (L1) | 0.282 | 0.371 | 0.247 | 0.452 |
+| return std (log ratio) | 0.035 | 0.091 | 0.356 | 0.249 |
+| vol clustering (RMSE) | 0.004 | 0.013 | 0.012 | 0.006 |
+| sign memory (RMSE) | 0.148 | 0.256 | 0.500 | 0.331 |
+| impact (RMSE, ticks) | 0.645 | 5.736 | 1.307 | 1.146 |
+| event mix (L1) | 0.014 | 0.004 | 0.004 | 0.045 |
+| 100-lot share (abs) | 0.084 | 0.006 | 0.063 | 0.194 |
+| gaps (L1 of quantiles) | 0.990 | 0.372 | 0.857 | 1.608 |
+| depth profile (L1) | 5.474 | 4.290 | 1.933 | 1.145 |
+INTC real_2025-12-08 done
+INTC history done
+INTC markov done
+INTC v2 done
+
+**INTC**: discrepancy from the real continuations (0 = identical)
+
+| fact | real_2025-12-08 | history | markov | v2 |
+|---|---|---|---|---|
+| spread (L1) | 0.043 | 0.136 | 0.108 | 0.017 |
+| return std (log ratio) | 0.059 | 0.694 | 0.957 | 0.096 |
+| vol clustering (RMSE) | 0.008 | 0.012 | 0.012 | 0.010 |
+| sign memory (RMSE) | 0.093 | 0.287 | 0.253 | 0.191 |
+| impact (RMSE, ticks) | 0.515 | 0.618 | 0.285 | 0.354 |
+| event mix (L1) | 0.051 | 0.005 | 0.032 | 0.048 |
+| 100-lot share (abs) | 0.016 | 0.001 | 0.000 | 0.094 |
+| gaps (L1 of quantiles) | 0.832 | 0.060 | 0.345 | 0.750 |
+| depth profile (L1) | 5.143 | 20.968 | 22.221 | 8.336 |
+exit 0

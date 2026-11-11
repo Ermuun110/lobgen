@@ -1,0 +1,13 @@
+# Official daily close (consolidated), Yahoo Finance chart API, fetched 2026-11-02.
+# For Nasdaq-listed stocks the official close is the Nasdaq closing cross price.
+date,ticker,close
+2025-12-08,GOOG,314.45
+2025-12-09,GOOG,317.75
+2025-12-10,GOOG,321.00
+2025-12-11,GOOG,313.70
+2025-12-12,GOOG,310.52
+2025-12-08,INTC,40.30
+2025-12-09,INTC,40.50
+2025-12-10,INTC,40.78
+2025-12-11,INTC,39.51
+2025-12-12,INTC,37.81
