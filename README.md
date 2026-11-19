@@ -90,7 +90,7 @@ minutes each for v2–v4, 2.2 hours for full).
 
 **Why v3 and v4 drift.** Their one-step loss matches v2's, and I've checked that the inputs the
 model sees while generating are exactly the ones it was trained on, so it's not a plumbing bug.
-The detective catches them on the timing between events. My guess is that the new inputs
+On GOOG the detective catches them mainly on the timing between events; on INTC v4, on order sizes. My guess is that the new inputs
 summarise the model's own recent output, so a small mistake gets fed back in and grows. Next I
 want to run my rollout diagnostics (`scripts/diagnose_rollout.py`) on v3 and try training on
 the model's own generated sequences.
@@ -131,11 +131,11 @@ Roughly the order I plan to work in:
 Free Nasdaq TotalView-ITCH 5.0 full-day files (`emi.nasdaq.com/ITCH/Nasdaq ITCH/`), converted to
 LOBSTER format by this repo — same raw feed LOBSTER is built from, own conversion.
 Core set: GOOG and INTC, 2025-12-08 .. 2025-12-12 (train Mon-Wed, validate Thu, test Fri):
-47M events, 0 invariant violations.
+45.3M events (`results/sim_replay.json`), 0 order-book invariant violations when validated.
 
 ```bash
 uv sync
-# fetch + filter (raw days are 4-18 GB; notebooks/fetch_itch_colab.ipynb does it in Colab)
+# fetch + filter (raw days are 8-13 GB compressed, 19-29 GB unpacked; notebooks/fetch_itch_colab.ipynb does it in Colab)
 uv run lobgen filter data/raw/S121225-v50.txt.gz --tickers GOOG INTC --out data/filtered/2025-12-12.itch
 uv run lobgen convert data/filtered/2025-12-12.itch.gz --ticker GOOG --date 2025-12-12
 uv run lobgen validate data/lobster/GOOG_2025-12-12_34200000_57600000_10.npz
@@ -156,12 +156,12 @@ crossed, no cancel of a missing order, volumes that add up.
 | `dt` | ns since the previous event |
 | `type`, `side` | LOBSTER type 1-5 (submit, partial cancel, delete, execution, hidden execution) |
 | `price` | submit: ticks from own-side best (negative = inside the spread); cancel / delete / execution: index of an *existing* level (so it can never point at an empty price); cancel / delete: a negative value −(r+1) is a **pointer** to the r-th newest live order on that side (used for the 16 newest); hidden: half-ticks |
-| `qpos` | which order in the level's queue: from the back for cancels and deletes, from the front for executions (0 is the mode for every type: 52-90% of cancels hit the newest order, 93-99% of executions the oldest) |
-| `size` | shares (a delete removes the whole order); for an execution, **0 = the whole resting order** (78-79% of executions) |
+| `qpos` | which order in the level's queue: from the back for cancels and deletes, from the front for executions |
+| `size` | shares (a delete removes the whole order); for an execution, **0 = the whole resting order** (76-84% of executions) |
 
 Two codes exist because of what the first model got wrong ([What didn't work](#what-didnt-work)).
 Real deletes are aimed at specific recent orders. Executions mostly consume the resting order
-whole, and a generator cannot see that order's size. With the pointer, 85-88% of GOOG
+whole, and a generator cannot see that order's size. With the pointer, 84-88% of GOOG
 cancels/deletes and 67-78% of INTC's are written as "the k-th newest order". The decode is
 still exact on every row (`--pointer 0 --no-whole-fill` rebuilds the v1 encoding).
 
@@ -261,7 +261,7 @@ of 3,797+ shares, median 5,406). Mid move after the order, ticks:
 |---|---|---|---|---|---|---|---|
 | real | 2.53 | 2.66 | 2.85 | 1.01 | 1.14 | 1.26 | 1.21 |
 | v2 | 2.28 | 2.78 | 2.86 | 0.80 | 0.84 | 0.89 | 0.83 |
-| v3 | 2.34 | 2.75 | 2.97 | 0.84 | 0.93 | 0.91 | 0.80 |
+| v3 | 2.34 | 2.75 | 2.97 | 0.84 | 0.93 | 0.91 | 0.79 |
 | v4 | 2.31 | 2.58 | 2.70 | 0.76 | 0.91 | 0.98 | 1.03 |
 | history baseline | 0.72 | 0.87 | 2.49 | 0.35 | 0.36 | 0.40 | 0.70 |
 | Markov baseline | 1.06 | 1.04 | 1.04 | 0.44 | 0.43 | 0.42 | 0.43 |
@@ -308,8 +308,8 @@ tracking test measures whether, given the real market, the generated stock follo
 over the next seconds (correlation across windows, skill against "price stays put", against a
 linear beta-to-ETF baseline that uses the same information), and how far the stock moves in the
 scenario compared with the real stock's beta to large market moves. The test day is a real news
-day: Broadcom's margin guidance set off an AI-stock sell-off (Nasdaq −1.6%; here GOOG −1.5%,
-INTC −3.7%, both with their sharpest minute around 10:58 ET), which is the tracking case study.
+day: Broadcom's margin guidance set off an AI-stock sell-off (here GOOG −1.4% and
+INTC −3.6% from open to close, both with their sharpest minute around 10:58 ET), which is the tracking case study.
 
 Results (10 s horizon, 80 windows over the test day; `results/track.json`). v3 is not tracked:
 it cannot see the market, and v4 with the market frozen is the no-news control.
@@ -380,8 +380,8 @@ ablation would separate them (not run yet).
 
 **v1 adapts to the day only partly.** Its share of 100-share submits on Friday GOOG is 55–63%.
 That sits between Monday's 34% and Friday's 79%, so 128 events of context recover only part of
-the day's regime. The `ctx32` ablation in the Colab notebook measures how much
-context matters. v2 adds a summary of the day so far as an input (§5).
+the day's regime. The `ctx32` ablation in the Colab notebook would measure how much
+context matters (not run yet). v2 adds a summary of the day so far as an input (§5).
 
 **Size repairs.** v1 asks for a partial cancel or execution larger than the target order on
 2.0–2.6% of events, against 0.3–1.3% for the baselines. A likely cause, not yet verified: the
@@ -432,7 +432,7 @@ An agent can produce convincing-looking numbers very quickly, so the project che
 instead of relying on the code being right:
 
 - Encoding every real day into simulator actions and decoding it back reproduces all 45.3M
-  messages and book rows exactly (§2).
+  messages and book rows exactly, apart from 44 sub-dollar stub quotes (§2).
 - Real data replayed through the simulator must score AUC 0.50, and two real stretches of the
   same day must score about 0.5. Both do, which rules out leaks in the detective (§4).
 - A test checks that the inputs the model sees while generating are exactly the ones it was
